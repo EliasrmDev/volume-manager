@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Ajustar volumen",
+  "version": "1.0",
+  "description": "Esta extensión permite ajustar el volumen de una página web",
+  "permissions": [
+    "scripting",
+    "activeTab"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png"
+  }
+}
