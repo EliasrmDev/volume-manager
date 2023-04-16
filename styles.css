@@ -41,6 +41,13 @@ h4 {
   margin: 0;
 }
 
+.audio-source {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 .range-style {
   height: 20px;
   outline: 0;
