@@ -44,10 +44,26 @@ h4 {
 }
 
 .audio-source {
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  position: relative;
+
+  label {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    top: 0;
+  }
+
+  h4 {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #1597ff;
+  }
 }
 
 .range-style {
@@ -55,7 +71,7 @@ h4 {
   outline: 0;
   border: 0;
   border-radius: 50px;
-  width: 200px;
+  width: 100%;
   margin: 20px 0 10px;
   transition: box-shadow 0.2s ease-in-out;
   filter: hue-rotate(-100deg);
@@ -104,7 +120,6 @@ h4 {
   border: none;
   border-radius: 25px;
   padding: 10px 20px;
-  margin: 15px 0 5px 0;
   cursor: pointer;
   transition: all 0.3s ease;
   font-family: inherit;
@@ -112,6 +127,7 @@ h4 {
   font-weight: 600;
   box-shadow: 0 2px 8px rgba(21, 151, 255, 0.3);
   min-width: 100px;
+  margin: 30px 0 0;
 }
 
 .mute-button:hover {
@@ -185,4 +201,143 @@ h4 {
 .shortcut-desc {
   font-size: 0.85rem;
   color: #ccc;
+}
+
+/* Estilos para indicador de audio */
+.audio-indicator {
+  width: 100%;
+  margin: 15px 0;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  max-height: fit-content;
+  overflow: hidden;
+}
+
+.indicator-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1597ff;
+}
+
+.indicator-icon {
+  font-size: 1.1rem;
+}
+
+.indicator-title {
+  font-size: 0.85rem;
+}
+
+.audio-tabs-list {
+  max-height: fit-content;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #1597ff rgba(255, 255, 255, 0.1);
+}
+
+.audio-tabs-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.audio-tabs-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.audio-tabs-list::-webkit-scrollbar-thumb {
+  background: #1597ff;
+  border-radius: 2px;
+}
+
+.audio-tab-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  margin: 4px 0;
+  background: rgba(21, 151, 255, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(21, 151, 255, 0.2);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.audio-tab-item:hover {
+  background: rgba(21, 151, 255, 0.15);
+  border-color: rgba(21, 151, 255, 0.3);
+}
+
+.audio-tab-item.current-tab {
+  background: rgba(21, 151, 255, 0.2);
+  border-color: #1597ff;
+  box-shadow: 0 0 0 1px rgba(21, 151, 255, 0.3);
+}
+
+.tab-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.tab-title {
+  font-size: 0.8rem;
+  color: #f3f3f3;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+
+.tab-url {
+  font-size: 0.7rem;
+  color: #999;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tab-audio-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
+}
+
+.audio-icon {
+  font-size: 1rem;
+  animation: pulse 1.5s ease-in-out infinite alternate;
+}
+
+.tab-switch-btn {
+  background: none;
+  border: 1px solid rgba(21, 151, 255, 0.5);
+  color: #1597ff;
+  border-radius: 4px;
+  padding: 3px 6px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-switch-btn:hover {
+  background: rgba(21, 151, 255, 0.1);
+  border-color: #1597ff;
+}
+
+.no-audio-message {
+  text-align: center;
+  color: #999;
+  font-size: 0.8rem;
+  padding: 15px;
+  font-style: italic;
+}
+
+@keyframes pulse {
+  from { opacity: 0.6; }
+  to { opacity: 1; }
 }

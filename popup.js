@@ -11,7 +11,7 @@ function aplicarEstiloDinamico(rangeId, percent) {
   styleEl.classList.add(rangeId);
   document.head.appendChild(styleEl);
   const styleSheet = styleEl.sheet;
-  styleSheet.insertRule(`#${rangeId}::-webkit-slider-container { background: linear-gradient(rgb(239, 239, 239), rgb(201, 201, 201)) ${percent * 2}px center no-repeat, linear-gradient(rgb(21, 151, 255), rgb(21, 151, 255)) }`, 0);
+  styleSheet.insertRule(`#${rangeId}::-webkit-slider-container { background: linear-gradient(rgb(239, 239, 239), rgb(201, 201, 201)) ${percent * 3}px center no-repeat, linear-gradient(rgb(21, 151, 255), rgb(21, 151, 255)) }`, 0);
 }
 
 async function volumeRangeManager() {
@@ -50,7 +50,7 @@ async function volumeRangeManager() {
       rangePercent = rangeValue * 100;
       textRange.innerHTML = Math.round(rangePercent) + '%';
       range.style.filter = `hue-rotate(-${rangePercent}deg)`;
-      textRange.style.filter = `hue-rotate(-${rangePercent}deg)`;
+      textRange.style.filter = `hue-rotate(${rangePercent}deg)`;
       aplicarEstiloDinamico(rangeId, rangePercent);
     };
 
@@ -162,6 +162,113 @@ async function muteManager(tabId) {
   }
 }
 
+// Manager del indicador de audio
+async function audioIndicatorManager() {
+  const audioIndicator = document.querySelector('#audio-indicator');
+  const audioTabsList = document.querySelector('#audio-tabs-list');
+
+  // Función para detectar pestañas con audio
+  const detectAudioTabs = async () => {
+    try {
+      const tabs = await chrome.tabs.query({});
+      const audioTabs = tabs.filter(tab => tab.audible);
+      const currentTab = await chrome.tabs.query({active: true, currentWindow: true});
+      const currentTabId = currentTab[0]?.id;
+
+      return {
+        audioTabs,
+        currentTabId
+      };
+    } catch (error) {
+      console.error('Error detectando pestañas con audio:', error);
+      return { audioTabs: [], currentTabId: null };
+    }
+  };
+  // Función para actualizar la interfaz del indicador
+  const updateAudioIndicator = async () => {
+
+    const { audioTabs, currentTabId } = await detectAudioTabs();
+
+    if (audioTabs.length === 0) {
+      audioTabsList.innerHTML = '<div class="no-audio-message">No hay pestañas reproduciendo audio</div>';
+      audioIndicator.style.opacity = '0.7';
+    } else {
+      audioIndicator.style.opacity = '1';
+      audioTabsList.innerHTML = audioTabs.map(tab => {
+        const isCurrentTab = tab.id === currentTabId;
+        const domain = new URL(tab.url).hostname;
+        const title = tab.title.length > 30 ? tab.title.substring(0, 30) + '...' : tab.title;
+
+        return `
+          <div class="audio-tab-item ${isCurrentTab ? 'current-tab' : ''}" data-tab-id="${tab.id}">
+            <div class="tab-info">
+              <div class="tab-title">${title}</div>
+              <div class="tab-url">${domain}</div>
+            </div>
+            <div class="tab-audio-indicator">
+              <span class="audio-icon">🎵</span>
+              ${!isCurrentTab ? '<button class="tab-switch-btn" data-tab-id="' + tab.id + '">Ir</button>' : '<span style="font-size: 0.7rem; color: #1597ff;">Actual</span>'}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Agregar event listeners para cambiar de pestaña
+      const switchButtons = audioTabsList.querySelectorAll('.tab-switch-btn');
+      switchButtons.forEach(button => {
+        button.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const tabId = parseInt(e.target.dataset.tabId);
+          try {
+            await chrome.tabs.update(tabId, { active: true });
+            await chrome.windows.update((await chrome.tabs.get(tabId)).windowId, { focused: true });
+            window.close(); // Cerrar popup después de cambiar
+          } catch (error) {
+            console.error('Error cambiando de pestaña:', error);
+          }
+        });
+      });
+
+      // Agregar event listeners para texto de pestaña (cambiar al hacer clic)
+      const tabItems = audioTabsList.querySelectorAll('.audio-tab-item');
+      tabItems.forEach(item => {
+        item.addEventListener('click', async (e) => {
+          if (e.target.classList.contains('tab-switch-btn')) return;
+
+          const tabId = parseInt(item.dataset.tabId);
+          try {
+            await chrome.tabs.update(tabId, { active: true });
+            await chrome.windows.update((await chrome.tabs.get(tabId)).windowId, { focused: true });
+            window.close();
+          } catch (error) {
+            console.error('Error cambiando de pestaña:', error);
+          }
+        });
+      });
+    }
+  };
+
+  // Actualizar inmediatamente
+  await updateAudioIndicator();
+
+  // Configurar actualización periódica
+  const updateInterval = setInterval(updateAudioIndicator, 2000);
+
+  // Limpiar intervalo cuando se cierre el popup
+  window.addEventListener('beforeunload', () => {
+    clearInterval(updateInterval);
+  });
+
+  // Listener para cambios en pestañas
+  if (chrome.tabs.onUpdated) {
+    chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
+      if (changeInfo.audible !== undefined) {
+        await updateAudioIndicator();
+      }
+    });
+  }
+}
+
 chrome.tabs.query({active: true, currentWindow: true}, async function(tabs) {
   let tabId = tabs[0].id;
   if (chrome.runtime.lastError) {
@@ -170,7 +277,8 @@ chrome.tabs.query({active: true, currentWindow: true}, async function(tabs) {
     let volumeRange = document.querySelector("#volume-range");
     volumeRange.setAttribute('tab-id', tabId);
 
-    // Inicializar managers primero
+    // Inicializar managers
+    await audioIndicatorManager(); // Inicializar indicador de audio
     await volumeRangeManager();
     await muteManager(tabId);
 
