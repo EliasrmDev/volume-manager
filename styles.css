@@ -143,3 +143,46 @@ h4 {
 .mute-text {
   font-size: 0.9rem;
 }
+
+.shortcuts-info {
+  margin-top: 25px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
+}
+
+.shortcuts-title {
+  margin: 0 0 12px 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1597ff;
+  text-align: center;
+}
+
+.shortcut-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8px 0;
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+}
+
+.shortcut-key {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  background: rgba(21, 151, 255, 0.2);
+  border: 1px solid rgba(21, 151, 255, 0.3);
+  border-radius: 4px;
+  color: #1597ff;
+  font-weight: 600;
+}
+
+.shortcut-desc {
+  font-size: 0.85rem;
+  color: #ccc;
+}

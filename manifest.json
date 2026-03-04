@@ -5,8 +5,36 @@
   "description": "Esta extensión permite ajustar el volumen de una página web",
   "permissions": [
     "scripting",
-    "activeTab"
+    "activeTab",
+    "storage",
+    "notifications"
   ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "commands": {
+    "mute-toggle": {
+      "suggested_key": {
+        "default": "Ctrl+M",
+        "mac": "Command+M"
+      },
+      "description": "Activar/desactivar mute"
+    },
+    "volume-up": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Up",
+        "mac": "Command+Shift+Up"
+      },
+      "description": "Subir volumen"
+    },
+    "volume-down": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Down",
+        "mac": "Command+Shift+Down"
+      },
+      "description": "Bajar volumen"
+    }
+  },
   "action": {
     "default_popup": "popup.html"
   },
