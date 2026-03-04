@@ -63,6 +63,65 @@ function setVolume(tabId, volume) {
   .then(() => console.log("injected a function"));
 }
 
+function muteManager(tabId) {
+  const muteBtn = document.querySelector('#mute-btn');
+  const volumeRange = document.querySelector('#volume-range');
+  const volumeText = document.querySelector('h4');
+  const muteIcon = document.querySelector('.mute-icon');
+  const muteText = document.querySelector('.mute-text');
+
+  let isMuted = localStorage.getItem('isMuted' + tabId) === 'true';
+  let volumeBeforeMute = localStorage.getItem('volumeBeforeMute' + tabId) || '1';
+
+  // Establecer estado inicial
+  updateMuteUI();
+
+  muteBtn.addEventListener('click', function() {
+    if (isMuted) {
+      // Unmute
+      isMuted = false;
+      volumeRange.value = volumeBeforeMute;
+      volumeRange.disabled = false;
+      setVolume(tabId, volumeBeforeMute);
+      localStorage.setItem('volume' + tabId, volumeBeforeMute);
+
+      // Trigger range input event to update UI
+      volumeRange.dispatchEvent(new Event('input'));
+    } else {
+      // Mute
+      volumeBeforeMute = volumeRange.value;
+      localStorage.setItem('volumeBeforeMute' + tabId, volumeBeforeMute);
+      isMuted = true;
+      volumeRange.value = 0;
+      volumeRange.disabled = true;
+      setVolume(tabId, 0);
+      localStorage.setItem('volume' + tabId, '0');
+
+      // Update UI manually since range is disabled
+      volumeText.innerHTML = '0%';
+      volumeRange.style.filter = 'hue-rotate(0deg)';
+      volumeText.style.filter = 'hue-rotate(0deg)';
+    }
+
+    localStorage.setItem('isMuted' + tabId, isMuted.toString());
+    updateMuteUI();
+  });
+
+  function updateMuteUI() {
+    if (isMuted) {
+      muteBtn.classList.add('muted');
+      muteIcon.textContent = '🔇';
+      muteText.textContent = 'Unmute';
+      volumeRange.disabled = true;
+    } else {
+      muteBtn.classList.remove('muted');
+      muteIcon.textContent = '🔊';
+      muteText.textContent = 'Mute';
+      volumeRange.disabled = false;
+    }
+  }
+}
+
 chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
   let tabId = tabs[0].id;
   if (chrome.runtime.lastError) {
@@ -71,9 +130,21 @@ chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     let volumeRange = document.querySelector("#volume-range");
     volumeRange.setAttribute('tab-id', tabId)
     volumeRange.addEventListener("input", function() {
-      setVolume(tabId, volumeRange.value);
+      // Solo actuar si no está muted
+      const isMuted = localStorage.getItem('isMuted' + tabId) === 'true';
+      if (!isMuted) {
+        setVolume(tabId, volumeRange.value);
+      }
     });
     volumeRangeManager();
-    setVolume(tabId, volumeRange.value);
+    muteManager(tabId);
+
+    // Verificar si está muted al inicializar
+    const isMuted = localStorage.getItem('isMuted' + tabId) === 'true';
+    if (!isMuted) {
+      setVolume(tabId, volumeRange.value);
+    } else {
+      setVolume(tabId, 0);
+    }
   }
 });
