@@ -11,7 +11,7 @@ function aplicarEstiloDinamico(rangeId, percent) {
   styleEl.classList.add(rangeId);
   document.head.appendChild(styleEl);
   const styleSheet = styleEl.sheet;
-  styleSheet.insertRule(`#${rangeId}::-webkit-slider-container { background: linear-gradient(rgb(239, 239, 239), rgb(201, 201, 201)) ${percent * 3}px center no-repeat, linear-gradient(rgb(21, 151, 255), rgb(21, 151, 255)) }`, 0);
+  styleSheet.insertRule(`#${rangeId}::-webkit-slider-container { background: linear-gradient(rgb(239, 239, 239), rgb(201, 201, 201)) ${percent * 2.5}px center no-repeat, linear-gradient(rgb(21, 151, 255), rgb(21, 151, 255)) }`, 0);
 }
 
 async function volumeRangeManager() {
@@ -50,7 +50,7 @@ async function volumeRangeManager() {
       rangePercent = rangeValue * 100;
       textRange.innerHTML = Math.round(rangePercent) + '%';
       range.style.filter = `hue-rotate(-${rangePercent}deg)`;
-      textRange.style.filter = `hue-rotate(${rangePercent}deg)`;
+      textRange.style.filter = `hue-rotate(-${rangePercent}deg)`;
       aplicarEstiloDinamico(rangeId, rangePercent);
     };
 
@@ -180,17 +180,17 @@ async function audioIndicatorManager() {
         currentTabId
       };
     } catch (error) {
-      console.error('Error detectando pestañas con audio:', error);
+      console.error('Error detecting audio tabs:', error);
       return { audioTabs: [], currentTabId: null };
     }
   };
-  // Función para actualizar la interfaz del indicador
+  // Function to update the audio indicator UI
   const updateAudioIndicator = async () => {
 
     const { audioTabs, currentTabId } = await detectAudioTabs();
 
     if (audioTabs.length === 0) {
-      audioTabsList.innerHTML = '<div class="no-audio-message">No hay pestañas reproduciendo audio</div>';
+      audioTabsList.innerHTML = '<div class="no-audio-message">No tabs are playing audio</div>';
       audioIndicator.style.opacity = '0.7';
     } else {
       audioIndicator.style.opacity = '1';
@@ -207,7 +207,7 @@ async function audioIndicatorManager() {
             </div>
             <div class="tab-audio-indicator">
               <span class="audio-icon">🎵</span>
-              ${!isCurrentTab ? '<button class="tab-switch-btn" data-tab-id="' + tab.id + '">Ir</button>' : '<span style="font-size: 0.7rem; color: #1597ff;">Actual</span>'}
+              ${!isCurrentTab ? '<button class="tab-switch-btn" data-tab-id="' + tab.id + '">Go</button>' : '<span style="font-size: 0.7rem; color: #1597ff;">Current</span>'}
             </div>
           </div>
         `;
